@@ -17,9 +17,10 @@ $(function() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var current = new google.maps.LatLng(
-                position.coords.latitude, 
+                position.coords.latitude,
                 position.coords.longitude);
             map.setCenter(current);
+            map.setZoom(16);
             var position = new google.maps.Marker({
                 position: current,
                 map: map,
