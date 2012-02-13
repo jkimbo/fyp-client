@@ -6,3 +6,11 @@ body {
 a {
   color: #00B7FF;
 }
+#controls {
+  position: absolute;
+  right: 10%;
+  top: 10%;
+  width: 10%;
+  height: 60%;
+  background: #fff;
+}
