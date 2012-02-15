@@ -12,35 +12,13 @@ $(function() {
             options
     );
 
-    var position;
+    var currentloc;
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var current = new google.maps.LatLng(
-                position.coords.latitude,
-                position.coords.longitude);
-            map.setCenter(current);
-            map.setZoom(16);
-            var position = new google.maps.Marker({
-                position: current,
-                map: map,
-                animation: google.maps.Animation.DROP,
-                title:"There you are!"
-            });
-            google.maps.event.addListener(position, 'click', toggleBounce);
-            function toggleBounce() {
-                if (position.getAnimation() != null) {
-                    position.setAnimation(null);
-                } else {
-                    position.setAnimation(google.maps.Animation.BOUNCE);
-                    setTimeout(function() {
-                        position.setAnimation(null);
-                    }, 1000);
-                }
-            }
-        }, function(msg) {
+        navigator.geolocation.getCurrentPosition(setPosition, function(msg) {
             alert('error: '+msg);
         });
+        navigator.geolocation.watchPosition(setPosition);
     } else {
           alert('geolocation not supported');
     }
@@ -49,5 +27,64 @@ $(function() {
         $('#map_canvas').width($(window).width());
         $('#map_canvas').height($(window).height());
     });
+
+    function setPosition(position) {
+        /*
+         * Set current marker
+         */
+        var current = new google.maps.LatLng(
+            position.coords.latitude,
+            position.coords.longitude);
+        map.setCenter(current);
+        map.setZoom(16);
+        if(currentloc) {
+            currentloc.setPosition(current);
+        } else {
+            currentloc = new google.maps.Marker({
+                position: current,
+                map: map,
+                animation: google.maps.Animation.DROP,
+                title:"There you are!"
+            });
+        }
+        google.maps.event.addListener(currentloc, 'click', toggleBounce);
+
+        setAddress(current, function(address) {
+            $('#address').text(address);
+        });
+
+        function toggleBounce() {
+            if (currentloc.getAnimation() != null) {
+                currentloc.setAnimation(null);
+            } else {
+                currentloc.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(function() {
+                    currentloc.setAnimation(null);
+                }, 1000);
+            }
+        }
+    }
+
 });
 
+/*
+ * Get address from latlng
+ *
+ * position - google maps latlng
+ *
+ * Returns string
+ */
+function setAddress(position, callback) {
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({'latLng': position}, function(results, status) {
+        if(status == google.maps.GeocoderStatus.OK) {
+            if(results[0]) {
+                if(typeof callback == 'function') {
+                    callback(results[1].formatted_address);
+                }
+            }
+        } else {
+            alert("Geocode was not successful for the following reason: " + status);
+        }
+    });
+}
