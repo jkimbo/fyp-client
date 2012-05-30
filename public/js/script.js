@@ -21,6 +21,7 @@ $(function() {
         navigator.geolocation.watchPosition(setPosition);
     } else {
           alert('geolocation not supported');
+          // if no geolocation then prompt to input manually
     }
 
     $(window).resize(function() {
