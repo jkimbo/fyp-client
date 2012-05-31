@@ -26,6 +26,13 @@ $(function() {
   Tracker.map.initialZoom = true;
 
   Tracker.view = new google.maps.LatLngBounds();
+  Tracker.directions = new google.maps.DirectionsService();
+  Tracker.directionsDisplay = new google.maps.DirectionsRenderer();
+  Tracker.directionsDisplay.setMap(Tracker.map);
+  Tracker.directionsDisplay.setOptions({
+    preserveViewport: true,
+    suppressMarkers: true
+  });
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -50,6 +57,8 @@ $(function() {
         Tracker.view.extend(pos);
         Tracker.map.fitBounds(Tracker.view);
 
+        var stop = pos; // TODO
+
         // get nearest coach location
         getCoach(msg.coords, function(msg) {
           var pos = new google.maps.LatLng(
@@ -69,6 +78,17 @@ $(function() {
           }
           Tracker.view.extend(pos);
           Tracker.map.fitBounds(Tracker.view);
+
+          // plot directions on map
+          Tracker.directions.route({
+            origin: pos,
+            destination: stop,
+            travelMode: google.maps.TravelMode.DRIVING
+          }, function(result, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              Tracker.directionsDisplay.setDirections(result);
+            }
+          });
         });
       });
     }, function(msg) {
