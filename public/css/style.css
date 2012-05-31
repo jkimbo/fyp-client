@@ -1,10 +1,17 @@
+html { 
+  height: 100% 
+}
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   margin: 0px;
   padding: 0px;
+  height: 100%;
 }
 a {
   color: #00B7FF;
+}
+#map_canvas { 
+  height: 100% 
 }
 #controls {
   position: absolute;
