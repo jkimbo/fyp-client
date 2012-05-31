@@ -38,59 +38,64 @@ $(function() {
     navigator.geolocation.getCurrentPosition(function(position) {
       setPosition(position);
       // get nearest stop location
-      getStop(position, function(msg) {
-        var pos = new google.maps.LatLng(
-          msg.coords.latitude,
-          msg.coords.longitude
-        );
-        if(Tracker.stop) {
-          Tracker.stop.setPosition(pos);
-        } else {
-          Tracker.stop = new google.maps.Marker({
-            position: pos,
-            map: Tracker.map,
-            icon: 'img/busstop.png',
-            animation: google.maps.Animation.Drop,
-            title: 'Stop'
-          });
-        }
-        Tracker.view.extend(pos);
-        Tracker.map.fitBounds(Tracker.view);
-
-        var stop = pos; // TODO
-
-        // get nearest coach location
-        getCoach(msg.coords, function(msg) {
+      getInfo('/findstop'
+        , { position: position }
+        , function(msg) {
           var pos = new google.maps.LatLng(
             msg.coords.latitude,
             msg.coords.longitude
           );
-          if(Tracker.coach) {
-            Tracker.coach.setPosition(pos);
+          if(Tracker.stop) {
+            Tracker.stop.setPosition(pos);
           } else {
-            Tracker.coach = new google.maps.Marker({
+            Tracker.stop = new google.maps.Marker({
               position: pos,
               map: Tracker.map,
-              icon: 'img/bus.png',
+              icon: 'img/busstop.png',
               animation: google.maps.Animation.Drop,
-              title: 'Coach'
+              title: 'Stop'
             });
           }
           Tracker.view.extend(pos);
           Tracker.map.fitBounds(Tracker.view);
 
-          // plot directions on map
-          Tracker.directions.route({
-            origin: pos,
-            destination: stop,
-            travelMode: google.maps.TravelMode.DRIVING
-          }, function(result, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-              Tracker.directionsDisplay.setDirections(result);
+          var stop = pos; // TODO
+
+          // get nearest coach location
+          getInfo('/findcoach'
+            , { position: msg.coords }
+            , function(msg) {
+              var pos = new google.maps.LatLng(
+                msg.coords.latitude,
+                msg.coords.longitude
+              );
+              if(Tracker.coach) {
+                Tracker.coach.setPosition(pos);
+              } else {
+                Tracker.coach = new google.maps.Marker({
+                  position: pos,
+                  map: Tracker.map,
+                  icon: 'img/bus.png',
+                  animation: google.maps.Animation.Drop,
+                  title: 'Coach'
+                });
+              }
+              Tracker.view.extend(pos);
+              Tracker.map.fitBounds(Tracker.view);
+              // plot directions on map
+              Tracker.directions.route({
+                origin: pos,
+                destination: stop,
+                travelMode: google.maps.TravelMode.DRIVING
+              }, function(result, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                  Tracker.directionsDisplay.setDirections(result);
+                }
+              });
             }
-          });
-        });
-      });
+          );
+        }
+      );
     }, function(msg) {
       alert('error: '+msg);
     });
@@ -146,7 +151,6 @@ $(function() {
       }
     }
   }
-
 });
 
 /*
@@ -172,36 +176,14 @@ function setAddress(position, callback) {
 }
 
 /*
- * Get location of nearest stop
+ * Get info from server
  */
-function getStop(position, callback) {
-  var url = config.serverUrl + '/findstop';
+function getInfo(route, data, callback) {
+  var url = config.serverUrl + route;
   $.ajax({
     dataType: 'jsonp',
-    jsonp: 'callback',
     url: url,
-    data: {
-      position: position
-    }
-  }).done(function(msg) {
-    if(typeof(callback) == 'function') {
-      callback(msg);
-    }
-  });
-}
-
-/*
- * Get location of nearest coach
- */
-function getCoach(position, callback) {
-  var url = config.serverUrl + '/find';
-  $.ajax({
-    dataType: 'jsonp',
-    jsonp: 'callback',
-    url: url,
-    data: {
-      position: position
-    }
+    data: data
   }).done(function(msg) {
     if(typeof(callback) == 'function') {
       callback(msg);
