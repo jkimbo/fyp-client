@@ -1,21 +1,20 @@
+window.Tracker = window.Tracker || {};
+
 $(function() {
   //$('#map_canvas').width($(window).width());
   //$('#map_canvas').height($(window).height());
-  var options = {
-    center: new google.maps.LatLng(51.50812890, -0.1280050),
-    zoom: 12,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  };
-
-  var map = new google.maps.Map(
+  Tracker.map = new google.maps.Map(
     document.getElementById("map_canvas"),
-    options
+    {
+      zoom: 12,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
   );
 
   // This is needed to set the zoom after fitbounds,
-  google.maps.event.addListener(map, 'zoom_changed', function() {
-    zoomChangeBoundsListener = 
-      google.maps.event.addListener(map, 'bounds_changed', function(event) {
+  google.maps.event.addListener(Tracker.map, 'zoom_changed', function() {
+    zoomChangeBoundsListener =
+      google.maps.event.addListener(Tracker.map, 'bounds_changed', function(event) {
         if (this.getZoom() > config.minZoom && this.initialZoom == true) {
           // Change max/min zoom here
           this.setZoom(config.minZoom);
@@ -24,52 +23,50 @@ $(function() {
         google.maps.event.removeListener(zoomChangeBoundsListener);
       });
   });
-  map.initialZoom = true;
+  Tracker.map.initialZoom = true;
 
-  var currentloc
-    , coach
-    , stop
-    , view = new google.maps.LatLngBounds();
+  Tracker.view = new google.maps.LatLngBounds();
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       setPosition(position);
+      // get nearest stop location
       getStop(position, function(msg) {
         var pos = new google.maps.LatLng(
           msg.coords.latitude,
           msg.coords.longitude
         );
-        if(stop) {
-          stop.setPosition(pos);
+        if(Tracker.stop) {
+          Tracker.stop.setPosition(pos);
         } else {
-          stop = new google.maps.Marker({
+          Tracker.stop = new google.maps.Marker({
             position: pos,
-            map: map,
+            map: Tracker.map,
             animation: google.maps.Animation.Drop,
             title: 'Stop'
           });
         }
-        view.extend(pos);
-        map.fitBounds(view);
+        Tracker.view.extend(pos);
+        Tracker.map.fitBounds(Tracker.view);
 
+        // get nearest coach location
         getCoach(msg.coords, function(msg) {
-          console.log(msg);
           var pos = new google.maps.LatLng(
             msg.coords.latitude,
             msg.coords.longitude
           );
-          if(coach) {
-            coach.setPosition(pos);
+          if(Tracker.coach) {
+            Tracker.coach.setPosition(pos);
           } else {
-            coach = new google.maps.Marker({
+            Tracker.coach = new google.maps.Marker({
               position: pos,
-              map: map,
+              map: Tracker.map,
               animation: google.maps.Animation.Drop,
               title: 'Coach'
             });
           }
-          view.extend(pos);
-          map.fitBounds(view);
+          Tracker.view.extend(pos);
+          Tracker.map.fitBounds(Tracker.view);
         });
       });
     }, function(msg) {
@@ -97,31 +94,31 @@ $(function() {
       position.coords.longitude
     );
     //map.setCenter(current);
-    view.extend(current);
-    map.fitBounds(view);
-    if(currentloc) {
-      currentloc.setPosition(current);
+    Tracker.view.extend(current);
+    Tracker.map.fitBounds(Tracker.view);
+    if(Tracker.currentloc) {
+      Tracker.currentloc.setPosition(current);
     } else {
-      currentloc = new google.maps.Marker({
+      Tracker.currentloc = new google.maps.Marker({
         position: current,
-        map: map,
+        map: Tracker.map,
         animation: google.maps.Animation.DROP,
         title:"There you are!"
       });
     }
-    google.maps.event.addListener(currentloc, 'click', toggleBounce);
+    google.maps.event.addListener(Tracker.currentloc, 'click', toggleBounce);
 
     setAddress(current, function(address) {
       $('#address').text(address);
     });
 
     function toggleBounce() {
-      if (currentloc.getAnimation() != null) {
-        currentloc.setAnimation(null);
+      if (Tracker.currentloc.getAnimation() != null) {
+        Tracker.currentloc.setAnimation(null);
       } else {
-        currentloc.setAnimation(google.maps.Animation.BOUNCE);
+        Tracker.currentloc.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
-          currentloc.setAnimation(null);
+          Tracker.currentloc.setAnimation(null);
         }, 1000);
       }
     }
