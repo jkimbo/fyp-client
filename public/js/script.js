@@ -28,13 +28,54 @@ $(function() {
 
   var currentloc
     , coach
+    , stop
     , view = new google.maps.LatLngBounds();
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(setPosition, function(msg) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      setPosition(position);
+      getStop(position, function(msg) {
+        var pos = new google.maps.LatLng(
+          msg.coords.latitude,
+          msg.coords.longitude
+        );
+        if(stop) {
+          stop.setPosition(pos);
+        } else {
+          stop = new google.maps.Marker({
+            position: pos,
+            map: map,
+            animation: google.maps.Animation.Drop,
+            title: 'Stop'
+          });
+        }
+        view.extend(pos);
+        map.fitBounds(view);
+
+        getCoach(msg.coords, function(msg) {
+          console.log(msg);
+          var pos = new google.maps.LatLng(
+            msg.coords.latitude,
+            msg.coords.longitude
+          );
+          if(coach) {
+            coach.setPosition(pos);
+          } else {
+            coach = new google.maps.Marker({
+              position: pos,
+              map: map,
+              animation: google.maps.Animation.Drop,
+              title: 'Coach'
+            });
+          }
+          view.extend(pos);
+          map.fitBounds(view);
+        });
+      });
+    }, function(msg) {
       alert('error: '+msg);
     });
-    navigator.geolocation.watchPosition(setPosition);
+    //navigator.geolocation.watchPosition(setPosition);
   } else {
     alert('geolocation not supported');
     // if no geolocation then prompt to input manually
@@ -74,26 +115,6 @@ $(function() {
       $('#address').text(address);
     });
 
-    getCoach(position, function(msg) {
-      console.log(msg);
-      var pos = new google.maps.LatLng(
-        msg.coords.latitude,
-        msg.coords.longitude
-      );
-      if(coach) {
-        coach.setPosition(pos);
-      } else {
-        coach = new google.maps.Marker({
-          position: pos,
-          map: map,
-          animation: google.maps.Animation.Drop,
-          title: 'Coach'
-        });
-      }
-      view.extend(pos);
-      map.fitBounds(view);
-    });
-
     function toggleBounce() {
       if (currentloc.getAnimation() != null) {
         currentloc.setAnimation(null);
@@ -126,6 +147,25 @@ function setAddress(position, callback) {
       }
     } else {
       alert("Geocode was not successful for the following reason: " + status);
+    }
+  });
+}
+
+/*
+ * Get location of nearest stop
+ */
+function getStop(position, callback) {
+  var url = config.serverUrl + '/findstop';
+  $.ajax({
+    dataType: 'jsonp',
+    jsonp: 'callback',
+    url: url,
+    data: {
+      position: position
+    }
+  }).done(function(msg) {
+    if(typeof(callback) == 'function') {
+      callback(msg);
     }
   });
 }
