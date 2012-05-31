@@ -42,6 +42,7 @@ $(function() {
           Tracker.stop = new google.maps.Marker({
             position: pos,
             map: Tracker.map,
+            icon: 'img/busstop.png',
             animation: google.maps.Animation.Drop,
             title: 'Stop'
           });
@@ -61,6 +62,7 @@ $(function() {
             Tracker.coach = new google.maps.Marker({
               position: pos,
               map: Tracker.map,
+              icon: 'img/bus.png',
               animation: google.maps.Animation.Drop,
               title: 'Coach'
             });
@@ -102,6 +104,7 @@ $(function() {
       Tracker.currentloc = new google.maps.Marker({
         position: current,
         map: Tracker.map,
+        icon: 'img/current.png',
         animation: google.maps.Animation.DROP,
         title:"There you are!"
       });
