@@ -174,7 +174,7 @@ var GMaps = (function($) {
     };
 
     // Center map on all markers
-    this.centerMap = function() {
+    this.centerMap = function(zoomout) {
       this.map.fitBounds(this.view);
       // wait till fitBounds has finished then zoom out one level to make sure all markers are available
       var zoomChangeBoundsListener = 

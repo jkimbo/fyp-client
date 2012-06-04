@@ -1,7 +1,6 @@
 window.Tracker = window.Tracker || {};
 
 $(function() {
-
   /*
    * Initialise Google maps
    */
@@ -41,7 +40,6 @@ $(function() {
 
       // find nearest stop
       Tracker.getInfo('/findstop', { position: position } , function(result) {
-        console.log(result);
         Tracker.nearstop = {
           marker: Tracker.map.addMarker({
                     lat: result.coords.latitude,
@@ -87,6 +85,11 @@ $(function() {
     not_supported: function() {
       alert("Your browser does not support geolocation");
     }
+  });
+
+  // Re-centre map on window resize
+  $(window).resize(function() {
+    Tracker.map.centerMap();
   });
 });
 
