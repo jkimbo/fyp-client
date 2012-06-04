@@ -176,7 +176,14 @@ var GMaps = (function($) {
     // Center map on all markers
     this.centerMap = function() {
       this.map.fitBounds(this.view);
-      this.zoomOut(1); // bit of a hack but makes sure all markers are visible
+      // wait till fitBounds has finished then zoom out one level to make sure all markers are available
+      var zoomChangeBoundsListener = 
+        google.maps.event.addListenerOnce(this.map, 'bounds_changed', function(event) {
+          if (this.getZoom()){
+            self.zoomOut(1); // bit of a hack but makes sure all markers are visible
+          }
+        });
+      setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000); // clear event listener in case it is not called
     };
 
     this.getCenter = function() {
