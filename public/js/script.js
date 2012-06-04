@@ -42,29 +42,42 @@ $(function() {
       // find nearest stop
       Tracker.getInfo('/findstop', { position: position } , function(result) {
         console.log(result);
-        Tracker.nearstop = Tracker.map.addMarker({
-          lat: result.coords.latitude,
-          lng: result.coords.longitude,
-          title: 'Nearest stop',
-          icon: 'img/busstop.png',
-          animation: google.maps.Animation.Drop,
-          infoWindow: {
-            content: '<p>Information about coach stop</p>'
-          }
-        });
+        Tracker.nearstop = {
+          marker: Tracker.map.addMarker({
+                    lat: result.coords.latitude,
+                    lng: result.coords.longitude,
+                    title: 'Nearest stop',
+                    icon: 'img/busstop.png',
+                    animation: google.maps.Animation.Drop,
+                    infoWindow: {
+                      content: '<p>Information about coach stop</p>'
+                    }
+                  }),
+          position: result.coords
+        };
 
         // plot nearest coach location
-        Tracker.nearcoach = Tracker.map.addMarker({
-          lat: result.coaches[0].coords.latitude,
-          lng: result.coaches[0].coords.longitude,
-          title: 'Nearest coach',
-          icon: 'img/bus.png',
-          animation: google.maps.Animation.Drop,
-          infoWindow: {
-            content: '<p>Route: '+result.coaches[0].route+'</p>'
-          }
+        Tracker.nearcoach = {
+          marker: Tracker.map.addMarker({
+                    lat: result.coaches[0].coords.latitude,
+                    lng: result.coaches[0].coords.longitude,
+                    title: 'Nearest coach',
+                    icon: 'img/bus.png',
+                    animation: google.maps.Animation.Drop,
+                    infoWindow: {
+                      content: '<p>Route: '+result.coaches[0].route+'</p>'
+                    }
+                  }),
+          position: result.coaches[0].coords
+        };
+
+        // plot route of coach to stop
+        Tracker.map.drawRoute({
+          origin: [Tracker.nearcoach.position.latitude, Tracker.nearcoach.position.longitude],
+          destination: [Tracker.nearstop.position.latitude, Tracker.nearstop.position.longitude]
         });
 
+        // center map on markers
         Tracker.map.centerMap();
       });
     },
