@@ -35,7 +35,8 @@ var GMaps = (function($) {
 
     if (options.mapType) {
       mapType = google.maps.MapTypeId[options.mapType.toUpperCase()];
-    } else {
+    }
+    else {
       mapType = google.maps.MapTypeId.ROADMAP;
     }
 
@@ -57,54 +58,51 @@ var GMaps = (function($) {
 
     this.map = new google.maps.Map(this.div, map_options);
 
-    // Boundary
-    this.view = new google.maps.LatLngBounds();
-
     // Context menus
     var buildContextMenuHTML = function(control, e) {
-      var html = '';
-      var options = window.context_menu[control];
-      for (var i in options){
-        if (options.hasOwnProperty(i)){
-          var option = options[i];
-          html += '<li><a id="' + control + '_' + i + '" href="#">' + 
-            option.title + '</a></li>';
+        var html = '';
+        var options = window.context_menu[control];
+        for (var i in options){
+          if (options.hasOwnProperty(i)){
+            var option = options[i];
+            html += '<li><a id="' + control + '_' + i + '" href="#">' + 
+              option.title + '</a></li>';
+          }
         }
-      }
-      var $context_menu = $('#gmaps_context_menu');
-      $context_menu.html(html);
-      $context_menu.undelegate();
-      $context_menu.delegate('li a', 'click', function(ev) {
-        ev.preventDefault();
-        options[$(this).attr('id').replace(control + '_', '')].action.call(self, e);
-        self.hideContextMenu();
-      });
+        var $context_menu = $('#gmaps_context_menu');
+        $context_menu.html(html);
+        $context_menu.undelegate();
+        $context_menu.delegate('li a', 'click', function(ev) {
+          ev.preventDefault();
+          options[$(this).attr('id').replace(control + '_', '')].action.call(self, e);
+          self.hideContextMenu();
+        });
 
-      var left = $(self.div).offset().left + e.pixel.x - 15;
-      var top = $(self.div).offset().top + e.pixel.y - 15;
-      $context_menu.css({
-        left: left,
-        top: top
-      }).fadeIn(200);
-    };
+        var left = $(self.div).offset().left + e.pixel.x - 15;
+        var top = $(self.div).offset().top + e.pixel.y - 15;
+        $context_menu.css({
+          left: left,
+          top: top
+        }).fadeIn(200);
+      };
 
     var buildContextMenu = function(control, e) {
-      if (control === 'marker') {
-        e.pixel = {};
-        var overlay = new google.maps.OverlayView();
-        overlay.setMap(self.map);
-        overlay.draw = function() {
-          var projection = overlay.getProjection();
-          var position = e.marker.getPosition();
-          e.pixel = projection.fromLatLngToContainerPixel(position);
+        if (control === 'marker') {
+          e.pixel = {};
+          var overlay = new google.maps.OverlayView();
+          overlay.setMap(self.map);
+          overlay.draw = function() {
+            var projection = overlay.getProjection();
+            var position = e.marker.getPosition();
+            e.pixel = projection.fromLatLngToContainerPixel(position);
 
+            buildContextMenuHTML(control, e);
+          };
+        }
+        else {
           buildContextMenuHTML(control, e);
-        };
-      }
-      else {
-        buildContextMenuHTML(control, e);
-      }
-    };
+        }
+      };
 
     this.setContextMenu = function(options) {
       window.context_menu[options.control] = {};
@@ -165,25 +163,34 @@ var GMaps = (function($) {
       google.maps.event.trigger(this.map, 'resize');
     };
 
+    this.fitZoom = function() {
+      var latLngs = [];
+      var markers_length = this.markers.length;
+
+      for(var i=0; i < markers_length; i++) {
+        latLngs.push(this.markers[i].getPosition());
+      }
+
+      this.fitBounds(latLngs);
+    };
+
+    this.fitBounds = function(latLngs) {
+      var total = latLngs.length;
+      var bounds = new google.maps.LatLngBounds();
+
+      for(var i=0; i < total; i++) {
+        bounds.extend(latLngs[i]);
+      }
+
+      this.map.fitBounds(bounds);
+    };
+
     // Map methods
     this.setCenter = function(lat, lng, callback) {
       this.map.panTo(new google.maps.LatLng(lat, lng));
       if (callback) {
         callback();
       }
-    };
-
-    // Center map on all markers
-    this.centerMap = function(zoomout) {
-      this.map.fitBounds(this.view);
-      // wait till fitBounds has finished then zoom out one level to make sure all markers are available
-      var zoomChangeBoundsListener = 
-        google.maps.event.addListenerOnce(this.map, 'bounds_changed', function(event) {
-          if (this.getZoom()){
-            self.zoomOut(1); // bit of a hack but makes sure all markers are visible
-          }
-        });
-      setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000); // clear event listener in case it is not called
     };
 
     this.getCenter = function() {
@@ -225,7 +232,7 @@ var GMaps = (function($) {
           });
         })(control, ev);
       }
-
+      
       control.index = 1;
 
       return control;
@@ -318,20 +325,21 @@ var GMaps = (function($) {
         }
 
         return marker;
-      } else {
+      }
+      else {
         throw 'No latitude or longitude defined';
       }
     };
 
     this.addMarker = function(options) {
       if (options.lat && options.lng) {
-        this.view.extend(new google.maps.LatLng(options.lat, options.lng));
         var marker = this.createMarker(options);
         marker.setMap(this.map);
         this.markers.push(marker);
 
         return marker;
-      } else {
+      }
+      else {
         throw 'No latitude or longitude defined';
       }
     };
@@ -342,7 +350,7 @@ var GMaps = (function($) {
       }
       return this.markers;
     };
-
+    
     this.hideInfoWindows = function() {
       for (var i=0, marker; marker=this.markers[i]; i++){
         if (marker.infoWindow){
@@ -350,7 +358,7 @@ var GMaps = (function($) {
         }
       }
     };
-
+    
     this.removeMarkers = function() {
       for (var i=0, marker; marker=this.markers[i]; i++){
         marker.setMap(null);
@@ -503,7 +511,7 @@ var GMaps = (function($) {
       options = $.extend({
         map: this.map
       }, options);
-
+      
       if($.isArray(options.paths)) {
           if($.isArray(options.paths[0])) {
              options.paths = $.map(options.paths, arrayToLatLng); 

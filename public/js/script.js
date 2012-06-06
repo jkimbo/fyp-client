@@ -76,7 +76,7 @@ $(function() {
         });
 
         // center map on markers
-        Tracker.map.centerMap();
+        Tracker.centerMap();
       });
     },
     error: function(error) {
@@ -107,4 +107,19 @@ Tracker.getInfo = function(route, data, callback) {
       callback(msg);
     }
   });
+}
+
+/*
+ * Center map on markers
+ */
+Tracker.centerMap = function() {
+    Tracker.map.fitZoom();
+    // wait till fitBounds has finished then zoom out one level to make sure all markers are available
+    var zoomChangeBoundsListener =
+      google.maps.event.addListenerOnce(Tracker.map.map, 'bounds_changed', function(event) {
+        if (Tracker.map.map.getZoom()){
+          Tracker.map.zoomOut(1); // bit of a hack but makes sure all markers are visible
+        }
+      });
+    setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000); // clear event listener in case it is not called
 }
