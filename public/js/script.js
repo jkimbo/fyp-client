@@ -40,6 +40,7 @@ $(function() {
 
       // find nearest stop
       Tracker.getInfo('/findstop', { position: position } , function(result) {
+        // add marker for nearest stop
         Tracker.nearstop = {
           marker: Tracker.map.addMarker({
                     lat: result.coords.latitude,
@@ -48,11 +49,27 @@ $(function() {
                     icon: 'img/busstop.png',
                     animation: google.maps.Animation.Drop,
                     infoWindow: {
-                      content: '<p>Information about coach stop</p>'
+                      content: '<p>'+result.description+'</p>'
                     }
                   }),
           position: result.coords
         };
+
+        var link = $('<a>')
+        .text(result.description)
+        .attr({
+          id: 'coachstop',
+          href: '#'
+        })
+        .data('stop', result.id)
+        .click(function() {
+          Tracker.map.setCenter(
+            Tracker.nearstop.position.latitude,
+            Tracker.nearstop.position.longitude
+          );
+          return false;
+        });
+        $('#controls #stop').empty().html('Your nearest stop is: ').append(link);
 
         // plot nearest coach location
         Tracker.nearcoach = {
@@ -89,8 +106,9 @@ $(function() {
 
   // Re-centre map on window resize
   $(window).resize(function() {
-    Tracker.map.centerMap();
+    Tracker.centerMap();
   });
+
 });
 
 /*
