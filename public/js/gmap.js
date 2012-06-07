@@ -16,6 +16,9 @@ Tracker.initMap = function() {
     lng: -0.17423
   });
 
+  // add controls
+  $('#container').append(T['controls'].r());
+
   /*
    * Find user location
    */
