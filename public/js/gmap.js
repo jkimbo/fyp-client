@@ -1,6 +1,12 @@
+/*
+ * Google maps rendering and functionality
+ */
 window.Tracker = window.Tracker || {};
 
-$(function() {
+/*
+ * Initialise map
+ */
+Tracker.initMap = function() {
   /*
    * Initialise Google maps
    */
@@ -9,6 +15,9 @@ $(function() {
     lat: 51.49843,
     lng: -0.17423
   });
+
+  // add controls
+  $('#container').append(T['controls'].r());
 
   /*
    * Find user location
@@ -39,7 +48,7 @@ $(function() {
       });
 
       // find nearest stop
-      Tracker.getInfo('/findstop', { position: position } , function(result) {
+      Tracker.getInfo('/findstop', { position: position, route: $.cookie('route') } , function(result) {
         // add marker for nearest stop
         Tracker.nearstop = {
           marker: Tracker.map.addMarker({
@@ -108,8 +117,7 @@ $(function() {
   $(window).resize(function() {
     Tracker.centerMap();
   });
-
-});
+}
 
 /*
  * Get info from server

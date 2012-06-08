@@ -1,15 +1,27 @@
-!!!
+doctype 5
 html
   head
     title= title
-    //-link(rel='stylesheet', href='/css/bootstrap.css')
-    //-link(rel='stylesheet', href='/css/bootstrap-responsive.css')
+    link(rel='stylesheet', href='/css/bootstrap.css')
+    link(rel='stylesheet', href='/css/bootstrap-responsive.css')
     link(rel='stylesheet', href='/css/style.css')
     script(src='http://maps.googleapis.com/maps/api/js?key=AIzaSyD4b3cn2rfZo8VOg3c0N1b1xO-6VmBI7xU&sensor=true')
   body!= body
 
   // javascript
   script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+  script(src='/js/libs/underscore.js')
+  script(src='/js/libs/backbone.js')
   script(src='/js/libs/gmaps.js')
+  script(src='/js/libs/jquery.cookie.js')
+
+  // templates
+  script(src='/js/libs/template.js')
+  script(src='/templates/compiled/controls.js')
+  script(src='/templates/compiled/map.js')
+  script(src='/templates/compiled/route.js')
+  script(src='/templates/compiled/index.js')
+
   script(src='/js/config.js')
-  script(src='/js/script.js')
+  script(src='/js/gmap.js')
+  script(src='/js/index.js')

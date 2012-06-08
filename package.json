@@ -7,5 +7,6 @@
     , "less": ">= 0.0.1"
     , "jade": ">= 0.0.1"
     , "socket.io": ">= 0.8.0"
+    , "hedgehog": "git+https://github.com/danielstocks/hedgehog.git"
   }
 }
