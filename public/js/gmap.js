@@ -48,7 +48,7 @@ Tracker.initMap = function() {
       });
 
       // find nearest stop
-      Tracker.getInfo('/findstop', { position: position } , function(result) {
+      Tracker.getInfo('/findstop', { position: position, route: $.cookie('route') } , function(result) {
         // add marker for nearest stop
         Tracker.nearstop = {
           marker: Tracker.map.addMarker({
