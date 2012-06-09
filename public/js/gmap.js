@@ -7,6 +7,7 @@ window.Tracker = window.Tracker || {};
  * Initialise map
  */
 Tracker.initMap = function() {
+  $('#container').append(T['map'].r());
   /*
    * Initialise Google maps
    */
@@ -19,119 +20,95 @@ Tracker.initMap = function() {
   // add controls
   $('#container').append(T['controls'].r());
 
-  /*
-   * Find user location
-   */
-  GMaps.geolocate({
-    success: function(position) {
-      Tracker.map.setCenter(position.coords.latitude, position.coords.longitude); // center map on
-      // Find location address
-      GMaps.geocode({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        callback: function(results, status) {
-          if(status == 'OK') {
-            // Add marker
-            Tracker.curlocation = Tracker.map.addMarker({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              title: 'You are here!',
-              icon: 'img/current.png',
-              infoWindow: {
-                content: '<p>'+results[0].formatted_address+'</p>'
-              }
-            });
-          } else {
-            console.log('Problem in geocode');
-          }
+  // Add marker
+  Tracker.curlocation = Tracker.map.addMarker({
+    lat: Tracker.app.user.get('position').coords.latitude,
+    lng: Tracker.app.user.get('position').coords.longitude,
+    title: 'You are here!',
+    icon: 'img/current.png',
+    infoWindow: {
+      content: '<p>'+Tracker.app.user.get('position_address')[0].formatted_address+'</p>'
+    }
+  });
+
+  // find nearest stop
+  Tracker.getInfo('/findstop', { position: Tracker.app.user.get('position') } , function(result) {
+    _.each(result.stops, function(stop, index) {
+      // add markers for each stop
+      Tracker.map.addMarker({
+        lat: stop.coords.latitude,
+        lng: stop.coords.longitude,
+        title: 'Nearest stop',
+        icon: 'img/busstop.png',
+        animation: google.maps.Animation.Drop,
+        infoWindow: {
+          content: '<p>'+stop.description+'</p>'
         }
       });
+      console.log(stop, index);
+    });
 
-      // find nearest stop
-      Tracker.getInfo('/findstop', { position: position, route: $.cookie('route') } , function(result) {
-        // add marker for nearest stop
-        Tracker.nearstop = {
-          marker: Tracker.map.addMarker({
-                    lat: result.coords.latitude,
-                    lng: result.coords.longitude,
-                    title: 'Nearest stop',
-                    icon: 'img/busstop.png',
-                    animation: google.maps.Animation.Drop,
-                    infoWindow: {
-                      content: '<p>'+result.description+'</p>'
-                    }
-                  }),
-          position: result.coords
-        };
+    /*
+    // add marker for nearest stop
+    Tracker.nearstop = {
+      marker: Tracker.map.addMarker({
+        lat: result.coords.latitude,
+        lng: result.coords.longitude,
+        title: 'Nearest stop',
+        icon: 'img/busstop.png',
+        animation: google.maps.Animation.Drop,
+        infoWindow: {
+          content: '<p>'+result.description+'</p>'
+        }
+      }),
+      position: result.coords
+    };
 
-        var link = $('<a>')
-        .text(result.description)
-        .attr({
-          id: 'coachstop',
-          href: '#'
-        })
-        .data('stop', result.id)
-        .click(function() {
-          Tracker.map.setCenter(
-            Tracker.nearstop.position.latitude,
-            Tracker.nearstop.position.longitude
-          );
-          return false;
-        });
-        $('#controls #stop').empty().html('Your nearest stop is: ').append(link);
+    var link = $('<a>')
+    .text(result.description)
+    .attr({
+      id: 'coachstop',
+      href: '#'
+    })
+    .data('stop', result.id)
+    .click(function() {
+      Tracker.map.setCenter(
+        Tracker.nearstop.position.latitude,
+        Tracker.nearstop.position.longitude
+      );
+      return false;
+    });
+    $('#controls #stop').empty().html('Your nearest stop is: ').append(link);
 
-        // plot nearest coach location
-        Tracker.nearcoach = {
-          marker: Tracker.map.addMarker({
-                    lat: result.coaches[0].coords.latitude,
-                    lng: result.coaches[0].coords.longitude,
-                    title: 'Nearest coach',
-                    icon: 'img/bus.png',
-                    animation: google.maps.Animation.Drop,
-                    infoWindow: {
-                      content: '<p>Route: '+result.coaches[0].route+'</p>'
-                    }
-                  }),
-          position: result.coaches[0].coords
-        };
+    // plot nearest coach location
+    Tracker.nearcoach = {
+      marker: Tracker.map.addMarker({
+        lat: result.coaches[0].coords.latitude,
+        lng: result.coaches[0].coords.longitude,
+        title: 'Nearest coach',
+        icon: 'img/bus.png',
+        animation: google.maps.Animation.Drop,
+        infoWindow: {
+          content: '<p>Route: '+result.coaches[0].route+'</p>'
+        }
+      }),
+      position: result.coaches[0].coords
+    };
 
-        // plot route of coach to stop
-        Tracker.map.drawRoute({
-          origin: [Tracker.nearcoach.position.latitude, Tracker.nearcoach.position.longitude],
-          destination: [Tracker.nearstop.position.latitude, Tracker.nearstop.position.longitude]
-        });
+    // plot route of coach to stop
+    Tracker.map.drawRoute({
+      origin: [Tracker.nearcoach.position.latitude, Tracker.nearcoach.position.longitude],
+      destination: [Tracker.nearstop.position.latitude, Tracker.nearstop.position.longitude]
+    });
 
-        // center map on markers
-        Tracker.centerMap();
-      });
-    },
-    error: function(error) {
-      alert('Geolocation failed: '+error.message);
-    },
-    not_supported: function() {
-      alert("Your browser does not support geolocation");
-    }
+    */
+    // center map on markers
+    Tracker.centerMap();
   });
 
   // Re-centre map on window resize
   $(window).resize(function() {
     Tracker.centerMap();
-  });
-}
-
-/*
- * Get info from server
- */
-Tracker.getInfo = function(route, data, callback) {
-  var url = config.serverUrl + route;
-  $.ajax({
-    dataType: 'jsonp',
-    url: url,
-    data: data
-  }).done(function(msg) {
-    if(typeof(callback) == 'function') {
-      callback(msg);
-    }
   });
 }
 
