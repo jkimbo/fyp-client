@@ -17,6 +17,7 @@ var AppRouter = Backbone.Router.extend({
     });
 
     $('#index #togglelocation').click(function() {
+      Tracker.locationbox.val('');
       if(Tracker.locationbox.data('location') && Tracker.locationbox.data('locationenabled')) {
         // clear determined location and allow user to input location manually
         Tracker.locationbox.data('location', false).removeAttr('disabled').focus();
