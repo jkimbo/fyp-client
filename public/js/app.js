@@ -6,6 +6,7 @@ window.Tracker = window.Tracker || {};
 var App = Backbone.Model.extend({
   initialize: function() {
     this.user = new User;
+    this.stops = new Stops;
   }
 });
 
@@ -55,6 +56,25 @@ var User = Backbone.Model.extend({
       }
     });
   }
+});
+
+var Stop = Backbone.Model.extend({
+  addMarker: function() {
+    this.marker = Tracker.map.addMarker({
+      lat: this.get('latitude'),
+      lng: this.get('longitude'),
+      title: 'Coach stop',
+      icon: 'img/busstop.png',
+      animation: google.maps.Animation.Drop,
+      infoWindow: {
+        content: '<p>'+this.get('description')+'</p>'
+      }
+    });
+  }
+});
+
+var Stops = Backbone.Collection.extend({
+  model: Stop
 });
 
 /*

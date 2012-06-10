@@ -10,6 +10,9 @@ body {
 #container {
   height: 100%;
 }
+.container-fluid {
+  padding: 0px;
+}
 #route {
   width: 220px;
   margin: 0 auto;
@@ -53,6 +56,11 @@ body {
   height: 70%;
   background: #fff;
   padding: 10px;
+}
+#controls #list {
+  list-style-type: none;
+  margin: 0px;
+  padding: 0px;
 }
 #controls #clearcookie {
   position: absolute;

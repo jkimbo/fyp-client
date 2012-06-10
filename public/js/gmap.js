@@ -34,50 +34,30 @@ Tracker.initMap = function() {
   // find nearest stop
   Tracker.getInfo('/findstop', { position: Tracker.app.user.get('position') } , function(result) {
     _.each(result.stops, function(stop, index) {
-      // add markers for each stop
-      Tracker.map.addMarker({
-        lat: stop.coords.latitude,
-        lng: stop.coords.longitude,
-        title: 'Nearest stop',
-        icon: 'img/busstop.png',
-        animation: google.maps.Animation.Drop,
-        infoWindow: {
-          content: '<p>'+stop.description+'</p>'
-        }
+      var stop = new Stop({
+        id: stop.id,
+        latitude: stop.coords.latitude,
+        longitude: stop.coords.longitude,
+        description: stop.description
       });
-      console.log(stop, index);
+      stop.addMarker();
+      Tracker.app.stops.add(stop);
     });
 
-    /*
-    // add marker for nearest stop
-    Tracker.nearstop = {
-      marker: Tracker.map.addMarker({
-        lat: result.coords.latitude,
-        lng: result.coords.longitude,
-        title: 'Nearest stop',
-        icon: 'img/busstop.png',
-        animation: google.maps.Animation.Drop,
-        infoWindow: {
-          content: '<p>'+result.description+'</p>'
-        }
-      }),
-      position: result.coords
-    };
-
-    var link = $('<a>')
-    .text(result.description)
-    .attr({
-      id: 'coachstop',
-      href: '#'
-    })
-    .data('stop', result.id)
-    .click(function() {
+    var list = T['stoplist'].render({
+      'stops': Tracker.app.stops.toJSON()
+    });
+    $('#controls #list').append(list)
+    .find('.coachstop').click(function() {
+      var stop = Tracker.app.stops.get($(this).data('id'));
       Tracker.map.setCenter(
-        Tracker.nearstop.position.latitude,
-        Tracker.nearstop.position.longitude
+        stop.get('latitude'),
+        stop.get('longitude')
       );
       return false;
     });
+
+    /*
     $('#controls #stop').empty().html('Your nearest stop is: ').append(link);
 
     // plot nearest coach location
@@ -118,6 +98,7 @@ Tracker.initMap = function() {
 Tracker.centerMap = function() {
     Tracker.map.fitZoom();
     // wait till fitBounds has finished then zoom out one level to make sure all markers are available
+    /*
     var zoomChangeBoundsListener =
       google.maps.event.addListenerOnce(Tracker.map.map, 'bounds_changed', function(event) {
         if (Tracker.map.map.getZoom()){
@@ -125,4 +106,5 @@ Tracker.centerMap = function() {
         }
       });
     setTimeout(function(){google.maps.event.removeListener(zoomChangeBoundsListener)}, 2000); // clear event listener in case it is not called
+    */
 }
