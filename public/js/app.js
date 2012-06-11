@@ -7,6 +7,7 @@ var App = Backbone.Model.extend({
   initialize: function() {
     this.user = new User;
     this.stops = new Stops;
+    this.coaches = new Coaches;
   }
 });
 
@@ -75,6 +76,14 @@ var Stop = Backbone.Model.extend({
 
 var Stops = Backbone.Collection.extend({
   model: Stop
+});
+
+var Coach = Backbone.Model.extend({
+
+});
+
+var Coaches = Backbone.Collection.extend({
+  model: Coach
 });
 
 /*

@@ -18,7 +18,7 @@ Tracker.initMap = function() {
   });
 
   // add controls
-  $('#container').append(T['controls'].r());
+  $('#sidebar').append(T['controls'].r());
 
   // Add marker
   Tracker.curlocation = Tracker.map.addMarker({
@@ -47,13 +47,59 @@ Tracker.initMap = function() {
     var list = T['stoplist'].render({
       'stops': Tracker.app.stops.toJSON()
     });
+
     $('#controls #list').append(list)
+    /*
+     * Center map on coach stop
+     * Clear other coach stop markers
+     * Add coach stop information to sidebar
+     */
     .find('.coachstop').click(function() {
       var stop = Tracker.app.stops.get($(this).data('id'));
       Tracker.map.setCenter(
         stop.get('latitude'),
         stop.get('longitude')
       );
+      $('#controls #stop').text(stop.get('description'));
+      $('#controls #list').fadeOut(200).empty();
+      // remove other stop markers
+      Tracker.getInfo('/getcoaches', { stop: stop.get('id') }, function(result) {
+        _.each(result.coaches, function(obj, index) {
+          var coach = new Coach(obj);
+          Tracker.app.coaches.add(coach);
+        });
+        var list = T['coachlist'].render({
+          'coaches': Tracker.app.coaches.toJSON()
+        });
+
+        $('#controls #list').append(list)
+        /*
+         * Add coach information to sidebar
+         * Show coach location on map
+         * Show coach route on map
+         * Give information about estimated time of arrival
+         */
+        .find('.coachlist').click(function() {
+          var coach = Tracker.app.coaches.get($(this).data('id'));
+          // plot coach route and current location
+          // TODO: colour route that coach has travelled in a lighter colour than the route it has yet to travel
+          Tracker.map.drawPolyline({
+            path: coach.get('route'),
+            strokeColor: '#131540',
+            strokeOpacity: 0.6,
+            strokeWeight: 6
+          });
+          coach.set('marker', Tracker.map.addMarker({
+            lat: coach.get('coords').latitude,
+            lng: coach.get('coords').longitude,
+            title: 'Coach location',
+            icon: '/img/bus.png'
+          }));
+          Tracker.centerMap();
+          return false;
+        });
+      });
+      $('#controls #list').append(T['coachlist'].render()).fadeIn(200);
       return false;
     });
 

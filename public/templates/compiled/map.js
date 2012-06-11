@@ -1,1 +1,1 @@
-window.T = window.T || {}; window.T.map = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div id=\"map_canvas\"></div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
+window.T = window.T || {}; window.T.map = new Hogan.Template({code: function (c,p,i) { var t=this;t.b(i=i||"");t.b("<div class=\"row-fluid\">");t.b("\n" + i);t.b("  <div class=\"span10\" id=\"map_canvas\"></div>");t.b("\n" + i);t.b("  <div id=\"sidebar\" class=\"span2\"></div>");t.b("\n" + i);t.b("</div>");t.b("\n");return t.fl(); },partials: {}, subs: {  }});
