@@ -60,9 +60,14 @@ Tracker.initMap = function() {
         stop.get('latitude'),
         stop.get('longitude')
       );
-      $('#controls #stop').text(stop.get('description'));
+      // remove other stops
+      $.each(Tracker.app.stops.without(stop), function(index, stop) {
+        stop.marker.setMap(null);
+        Tracker.map.markers = _.without(Tracker.map.markers, stop.marker);
+      });
+      $('#controls #stop').text(stop.get('description')); // TODO
       $('#controls #list').fadeOut(200).empty();
-      // remove other stop markers
+      // TODO remove other stop markers
       Tracker.getInfo('/getcoaches', { stop: stop.get('id') }, function(result) {
         _.each(result.coaches, function(obj, index) {
           var coach = new Coach(obj);
@@ -81,6 +86,8 @@ Tracker.initMap = function() {
          */
         .find('.coachlist').click(function() {
           var coach = Tracker.app.coaches.get($(this).data('id'));
+          $('#controls #coach').text('Coach: '+coach.get('id'));
+          $('#controls #list').fadeOut(200).empty(); // TODO
           // plot coach route and current location
           // TODO: colour route that coach has travelled in a lighter colour than the route it has yet to travel
           Tracker.map.drawPolyline({
