@@ -50,7 +50,7 @@ Tracker.initMap = function() {
 
     $('#controls #list').append(list)
     /*
-     * Center map on coach stop
+     * Centre map on coach stop
      * Clear other coach stop markers
      * Add coach stop information to sidebar
      */
@@ -67,7 +67,6 @@ Tracker.initMap = function() {
       });
       $('#controls #stop').text(stop.get('description')); // TODO
       $('#controls #list').fadeOut(200).empty();
-      // TODO remove other stop markers
       Tracker.getInfo('/getcoaches', { stop: stop.get('id') }, function(result) {
         _.each(result.coaches, function(obj, index) {
           var coach = new Coach(obj);
