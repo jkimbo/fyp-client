@@ -36,8 +36,8 @@ Tracker.initMap = function() {
     _.each(result.stops, function(stop, index) {
       var stop = new Stop({
         id: stop.id,
-        latitude: stop.coords.latitude,
-        longitude: stop.coords.longitude,
+        latitude: stop.lat,
+        longitude: stop.lng,
         description: stop.description
       });
       stop.addMarker();
