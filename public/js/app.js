@@ -62,8 +62,8 @@ var User = Backbone.Model.extend({
 var Stop = Backbone.Model.extend({
   addMarker: function() {
     this.marker = Tracker.map.addMarker({
-      lat: this.get('latitude'),
-      lng: this.get('longitude'),
+      lat: this.get('lat'),
+      lng: this.get('lng'),
       title: 'Coach stop',
       icon: 'img/busstop.png',
       animation: google.maps.Animation.Drop,

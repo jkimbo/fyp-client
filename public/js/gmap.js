@@ -34,12 +34,7 @@ Tracker.initMap = function() {
   // find nearest stop
   Tracker.getInfo('/findstop', { position: Tracker.app.user.get('position') } , function(result) {
     _.each(result.stops, function(stop, index) {
-      var stop = new Stop({
-        id: stop.id,
-        latitude: stop.lat,
-        longitude: stop.lng,
-        description: stop.description
-      });
+      var stop = new Stop(stop);
       stop.addMarker();
       Tracker.app.stops.add(stop);
     });
