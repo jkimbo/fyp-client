@@ -3,8 +3,11 @@
  */
 var AppRouter = Backbone.Router.extend({
   routes: {
+    'route/:id': 'route',
+    'coach/:id': 'coach',
+    'stop/:id': 'stop',
     '*page': 'index',
-    '/test': 'test'
+    'test': 'test'
   },
   index: function(page) {
     $('#container').append(T['index'].r());
@@ -62,6 +65,9 @@ var AppRouter = Backbone.Router.extend({
   },
   test: function() {
     console.log('test');
+  },
+  stop: function(id) {
+    console.log('stop', id);
   }
 });
 

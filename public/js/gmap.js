@@ -32,7 +32,7 @@ Tracker.initMap = function() {
   });
 
   // find nearest stop
-  Tracker.getInfo('/findstop', { position: Tracker.app.user.get('position') } , function(result) {
+  Tracker.getInfo('/stops', { position: Tracker.app.user.get('position') } , function(result) {
     _.each(result.stops, function(stop, index) {
       var stop = new Stop(stop);
       stop.addMarker();
@@ -50,10 +50,11 @@ Tracker.initMap = function() {
      * Add coach stop information to sidebar
      */
     .find('.coachstop').click(function() {
+      Tracker.router.navigate('stop/'+$(this).data('id'));
       var stop = Tracker.app.stops.get($(this).data('id'));
       Tracker.map.setCenter(
-        stop.get('latitude'),
-        stop.get('longitude')
+        stop.get('lat'),
+        stop.get('lng')
       );
       // remove other stops
       $.each(Tracker.app.stops.without(stop), function(index, stop) {
@@ -62,7 +63,9 @@ Tracker.initMap = function() {
       });
       $('#controls #stop').text(stop.get('description')); // TODO
       $('#controls #list').fadeOut(200).empty();
-      Tracker.getInfo('/getcoaches', { stop: stop.get('id') }, function(result) {
+
+      Tracker.getInfo('/coaches', { stop: stop.get('id') }, function(result) {
+        console.log(result);
         _.each(result.coaches, function(obj, index) {
           var coach = new Coach(obj);
           Tracker.app.coaches.add(coach);
@@ -70,8 +73,8 @@ Tracker.initMap = function() {
         var list = T['coachlist'].render({
           'coaches': Tracker.app.coaches.toJSON()
         });
-
         $('#controls #list').append(list)
+
         /*
          * Add coach information to sidebar
          * Show coach location on map
