@@ -94,4 +94,7 @@ $(function() {
   socket.on('message', function(data) {
     console.log(data);
   });
+  socket.on('location', function(data) {
+    console.log(data);
+  });
 });
