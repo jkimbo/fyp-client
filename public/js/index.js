@@ -11,7 +11,11 @@ var AppRouter = Backbone.Router.extend({
   },
   index: function(page) {
     $('#container').append(T['index'].r());
-    console.log(Tracker);
+    Tracker.mapbackground = new GMaps({
+      div: '#mapbackground',
+      lat: 51.49843,
+      lng: -0.17423
+    });
     Tracker.locationbox = $('#indexform #curlocation')
     .keypress(function(e) {
       if(e.which == 13) {
@@ -37,8 +41,19 @@ var AppRouter = Backbone.Router.extend({
       return false;
     });
 
-    Tracker.app.user.getLocation(function(positon, location) {
+    Tracker.app.user.getLocation(function(position, location) {
       Tracker.setLocation(location.formatted_address);
+      // Add marker
+      Tracker.curlocation = Tracker.mapbackground.addMarker({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        title: 'You are here!',
+        icon: 'img/current.png',
+        infoWindow: {
+          content: '<p>'+location.formatted_address+'</p>'
+        }
+      });
+      Tracker.mapbackground.setCenter(position.coords.latitude, position.coords.longitude);
     });
 
     /*
