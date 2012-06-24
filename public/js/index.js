@@ -19,7 +19,37 @@ var AppRouter = Backbone.Router.extend({
     Tracker.locationbox = $('#indexform #curlocation')
     .keypress(function(e) {
       if(e.which == 13) {
-        console.log('enter');
+        var address = $(this).val();
+        // get location
+        GMaps.geocode({
+          address: address,
+          callback: function(results, status) {
+            if(status == 'OK') {
+              var latlng = results[0].geometry.location;
+              Tracker.mapbackground.setCenter(latlng.lat(), latlng.lng());
+              Tracker.curlocation.setMap(null);
+              Tracker.curlocation = Tracker.mapbackground.addMarker({
+                lat: latlng.lat(),
+                lng: latlng.lng(),
+                title: 'You are here!',
+                icon: 'img/current.png',
+                infoWindow: {
+                  content: '<p>'+location.formatted_address+'</p>'
+                }
+              });
+              Tracker.app.user.set('position', {
+                coords: {
+                  lat: latlng.lat(),
+                  lng: latlng.lng()
+                }
+              });
+            } else {
+              alert('Cannot find location. Please try again');
+            }
+          }
+        });
+        console.log(address);
+        return false;
       }
     });
 
