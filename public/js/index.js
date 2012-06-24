@@ -39,16 +39,17 @@ var AppRouter = Backbone.Router.extend({
               });
               Tracker.app.user.set('position', {
                 coords: {
-                  lat: latlng.lat(),
-                  lng: latlng.lng()
+                  latitude: latlng.lat(),
+                  longitude: latlng.lng()
                 }
               });
+              $('#container').empty();
+              Tracker.initMap();
             } else {
               alert('Cannot find location. Please try again');
             }
           }
         });
-        console.log(address);
         return false;
       }
     });
