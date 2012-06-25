@@ -88,18 +88,33 @@ Tracker.initMap = function() {
           // plot coach route and current location
           // TODO: colour route that coach has travelled in a lighter colour than the route it has yet to travel
           Tracker.map.drawPolyline({
-            path: coach.get('route'),
+            path: coach.get('route').points,
             strokeColor: '#131540',
             strokeOpacity: 0.6,
             strokeWeight: 6
           });
           coach.set('marker', Tracker.map.addMarker({
-            lat: coach.get('coords').latitude,
-            lng: coach.get('coords').longitude,
+            lat: coach.get('location').lat,
+            lng: coach.get('location').lng,
             title: 'Coach location',
             icon: '/img/bus.png'
           }));
           Tracker.centerMap();
+
+          // subscribe to coach channel
+          coach.socket = io.connect('http://localhost:1337/coach-'+coach.get('id'));
+          coach.socket.on('connect', function() {
+            coach.socket.emit('set stop', stop.get('id'));
+          });
+          coach.socket.on('message', function(data) {
+            console.log(data);
+          });
+          coach.socket.on('location', function(data) {
+            // update coach location
+            console.log(data);
+            coach.get('marker').setPosition(new google.maps.LatLng(data.lat, data.lng));
+            // update estimated time of arrival
+          });
           return false;
         });
       });

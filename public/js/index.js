@@ -135,12 +135,4 @@ $(function() {
     location.reload(true);
     return false;
   });
-
-  var socket = io.connect('http://localhost:1337/coach-101');
-  socket.on('message', function(data) {
-    console.log(data);
-  });
-  socket.on('location', function(data) {
-    console.log(data);
-  });
 });
