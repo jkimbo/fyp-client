@@ -76,9 +76,27 @@ body {
   margin: 0px;
   padding: 0px;
 }
+#controls #list li a {
+  display: block;
+  height: 25px;
+  padding-left: 30px;
+  background: url('../img/busstop2.png') 0px 0px no-repeat;
+}
+#controls #list li a.coachlist {
+  background: url('../img/bus2.png') 0px 0px no-repeat;
+}
 #controls #clearcookie {
   position: absolute;
   bottom: 10px;
+}
+#stop {
+  display: none;
+  padding-left: 30px;
+  height: 25px;
+  font-weight: bold;
+  background: url('../img/busstop2.png') 0px 0px no-repeat;
+  border-bottom: 1px solid #BEBEBE;
+  margin-bottom: 10px;
 }
 .coachinfo {
   margin-top: 10px;

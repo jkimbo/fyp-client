@@ -61,7 +61,7 @@ Tracker.initMap = function() {
         stop.marker.setMap(null);
         Tracker.map.markers = _.without(Tracker.map.markers, stop.marker);
       });
-      $('#controls #stop').text(stop.get('description')); // TODO
+      $('#controls #stop').text(stop.get('description')).show(); // TODO
       $('#controls #list').fadeOut(200).empty();
 
       Tracker.getInfo('/coaches', { stop: stop.get('id') }, function(result) {
@@ -121,31 +121,6 @@ Tracker.initMap = function() {
       return false;
     });
 
-    /*
-    $('#controls #stop').empty().html('Your nearest stop is: ').append(link);
-
-    // plot nearest coach location
-    Tracker.nearcoach = {
-      marker: Tracker.map.addMarker({
-        lat: result.coaches[0].coords.latitude,
-        lng: result.coaches[0].coords.longitude,
-        title: 'Nearest coach',
-        icon: 'img/bus.png',
-        animation: google.maps.Animation.Drop,
-        infoWindow: {
-          content: '<p>Route: '+result.coaches[0].route+'</p>'
-        }
-      }),
-      position: result.coaches[0].coords
-    };
-
-    // plot route of coach to stop
-    Tracker.map.drawRoute({
-      origin: [Tracker.nearcoach.position.latitude, Tracker.nearcoach.position.longitude],
-      destination: [Tracker.nearstop.position.latitude, Tracker.nearstop.position.longitude]
-    });
-
-    */
     // center map on markers
     Tracker.centerMap();
   });

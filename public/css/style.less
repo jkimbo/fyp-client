@@ -75,11 +75,32 @@ body {
     list-style-type: none;
     margin: 0px;
     padding: 0px;
+    li {
+      a {
+        display: block;
+        height: 25px;
+        padding-left: 30px;
+        background: url('../img/busstop2.png') 0px 0px no-repeat;
+        &.coachlist {
+          background: url('../img/bus2.png') 0px 0px no-repeat;
+        }
+      }
+    }
   }
   #clearcookie {
     position: absolute;
     bottom: 10px;
   }
+}
+
+#stop {
+  display: none;
+  padding-left: 30px;
+  height: 25px;
+  font-weight: bold;
+  background: url('../img/busstop2.png') 0px 0px no-repeat;
+  border-bottom: 1px solid #BEBEBE;
+  margin-bottom: 10px;
 }
 
 .coachinfo {
