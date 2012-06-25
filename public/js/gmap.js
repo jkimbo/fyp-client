@@ -67,8 +67,9 @@ Tracker.initMap = function() {
       Tracker.getInfo('/coaches', { stop: stop.get('id') }, function(result) {
         console.log(result);
         _.each(result.coaches, function(obj, index) {
-          var coach = new Coach(obj);
-          Tracker.app.coaches.add(coach);
+          console.log(obj);
+          obj.dur_hum = moment().add('seconds', obj.duration).fromNow();
+          Tracker.app.coaches.add(new Coach(obj));
         });
         var list = T['coachlist'].render({
           'coaches': Tracker.app.coaches.toJSON()
@@ -83,8 +84,8 @@ Tracker.initMap = function() {
          */
         .find('.coachlist').click(function() {
           var coach = Tracker.app.coaches.get($(this).data('id'));
-          $('#controls #coach').text('Coach: '+coach.get('id'));
-          $('#controls #list').fadeOut(200).empty(); // TODO
+          //$('#controls #coach').html(T['coachinfo'].render(coach.toJSON()));
+          //$('#controls #list').fadeOut(200).empty(); // TODO
           // plot coach route and current location
           // TODO: colour route that coach has travelled in a lighter colour than the route it has yet to travel
           Tracker.map.drawPolyline({
@@ -106,14 +107,12 @@ Tracker.initMap = function() {
           coach.socket.on('connect', function() {
             coach.socket.emit('set stop', stop.get('id'));
           });
-          coach.socket.on('message', function(data) {
-            console.log(data);
-          });
           coach.socket.on('location', function(data) {
             // update coach location
-            console.log(data);
             coach.get('marker').setPosition(new google.maps.LatLng(data.lat, data.lng));
             // update estimated time of arrival
+            data.dur_hum = moment().add('seconds', data.duration).fromNow();
+            $('#list #'+coach.get('id')+' #duration').text(data.dur_hum);
           });
           return false;
         });

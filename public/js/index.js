@@ -110,7 +110,8 @@ var AppRouter = Backbone.Router.extend({
     }
   },
   test: function() {
-    console.log('test');
+    $('#container').empty();
+    Tracker.initMap();
   },
   stop: function(id) {
     console.log('stop', id);
